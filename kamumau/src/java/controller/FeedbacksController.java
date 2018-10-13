@@ -4,48 +4,60 @@
  * and open the template in the editor.
  */
 package controller;
-
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.List;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import model.Feedback;
 /**
  *
- * @author x201
+ * @author thancook
  */
 @WebServlet(name = "FeedbacksController", urlPatterns = {"/FeedbacksController"})
 public class FeedbacksController extends HttpServlet {
-
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+    
+  protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet FeedbacksController</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet FeedbacksController at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+            String action = request.getParameter("action");
+            System.out.println(action);
+            try {
+                switch (action) {
+                    case "new":
+                        showNewForm(request, response);
+                        break;
+                    default:
+                        listFeedback(request, response);
+                        break;
+                }
+            } catch (SQLException e) {
+                throw new ServletException(e);
+            }
         }
     }
-
+  
+    private void showNewForm(HttpServletRequest request, HttpServletResponse response)
+                throws ServletException, IOException {
+            RequestDispatcher dispatcher = request.getRequestDispatcher("feedbacks/new.jsp");
+            dispatcher.forward(request, response);
+        }
+  
+    private void listFeedback(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
+        Feedback f = new Feedback();
+        List<Feedback> feedbacks = f.all();
+        request.setAttribute("feedbacks", feedbacks);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("feedbacks/list.jsp");
+        dispatcher.forward(request, response);
+    }
+    
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -59,6 +71,7 @@ public class FeedbacksController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
+        
     }
 
     /**
@@ -84,5 +97,5 @@ public class FeedbacksController extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }
+
