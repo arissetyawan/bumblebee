@@ -20,8 +20,8 @@ import model.User;
  *
  * @author x201
  */
-@WebServlet(name = "UsersController", urlPatterns = {"/UsersController"})
-public class UsersController extends HttpServlet {
+@WebServlet(name = "UsersController", urlPatterns = {"/users"})
+public class UsersController extends ApplicationController {
     private final static String add_action ="new";
     private final static String login_action = "login";
     private final static String logout_action = "logout";
@@ -40,38 +40,71 @@ public class UsersController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            String action = request.getParameter("action");
-            if(action==null){
-                action= "list";
+        String action = request.getParameter("action");
+        if(action==null){
+            action= "login";
+        }
+        try{
+        switch (action) {
+            case "new":
+                ShowNewForm(request, response);
+                break;
+            case "create":
+                createUser(request, response);
+                break;
+            case "logout":
+                doLogout(request, response);
+                break;
+            case "do-login":
+                doLogin(request, response);
+                break;
+            case "welcome":
+                showWelcomePage(request, response);
+                break;
+            default:
+                showLoginForm(request, response);
+                break;
             }
-            try{
-                switch (action){
-                    case "new":
-                        ShowNewForm(request, response);
-                        break;
-                    case "create":
-                        createUser(request, response);
-                        break;
-                    case "login":
-                        doLogin(request, response);
-                        break;
-                    case "logout":
-                        doLogout(request, response);
-                    case "welcomepage":
-                        showWelcomePage(request, response);
-                    default:
-                        showLoginForm(request, response);
-                        break;
-                }
-            }
-            catch (SQLException ex){
-                throw new ServletException(ex);
-            }
+        }
+        catch (SQLException ex){
+            throw new ServletException(ex);
         }
     }
 
+    private void doLogin(HttpServletRequest request, HttpServletResponse response)
+                throws ServletException, IOException, ServletException  {
+                String email= request.getParameter("email");
+                String passwd= request.getParameter("password");
+                User user= new User();     
+                user.setEmail(email);
+                System.out.println("Isi email : " + email + " passwordnya : "+ passwd);
+                
+                user.setPassword(passwd);
+                logout(request, response);
+                if(user.doLogin()){
+                    setLoggedIn(user, request, response);
+                    showWelcomePage(request, response);
+                    System.out.println("Login berhasil.");
+                    
+                }else{
+                    System.out.println("Login gagal.");
+                }
+        }
+    private void doLogout(HttpServletRequest request, HttpServletResponse response)
+                throws ServletException, IOException, ServletException  {
+                logout(request, response);
+                showLoginForm(request, response);
+        }
+    private void showLoginForm(HttpServletRequest request, HttpServletResponse response)
+                throws ServletException, IOException, ServletException  {
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/users/login.jsp");
+            dispatcher.forward(request, response);
+        }
+    private void showWelcomePage(HttpServletRequest request, HttpServletResponse response)
+                throws ServletException, IOException, ServletException  {
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/users/welcome.jsp");
+            dispatcher.forward(request, response);
+        }
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -111,52 +144,13 @@ public class UsersController extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    private void doLogin(HttpServletRequest request, HttpServletResponse response) 
-    throws SQLException, IOException,ServletException{
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-        User user= new User();
-        user.setEmail(email);
-        user.setPassword(password);
-        logout(request, response);
-        if(user.doLogin()){
-            setLoggedIn(user, request, response);
-            showWelcomePage(request, response);
-        }
-        
-    }
-
-    private void doLogout(HttpServletRequest request, HttpServletResponse response) 
-    throws ServletException,IOException,SQLException{
-        logout(request, response);
-        showLoginForm(request, response);
-    }
-
-    private void showLoginForm(HttpServletRequest request, HttpServletResponse response) 
-    throws ServletException,IOException{
-        RequestDispatcher dispatcher = request.getRequestDispatcher("users/login.jsp");
-        dispatcher.forward(request, response);
-    }
-
-    private void showWelcomePage(HttpServletRequest request, HttpServletResponse response) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    private void logout(HttpServletRequest request, HttpServletResponse response) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    private void setLoggedIn(User user, HttpServletRequest request, HttpServletResponse response) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    private void ShowNewForm(HttpServletRequest request, HttpServletResponse response) 
-    throws ServletException,IOException{
+    private void ShowNewForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException,IOException{
         RequestDispatcher dispatcher = request.getRequestDispatcher("users/signup.jsp");
         dispatcher.forward(request, response);
-    }
+    }        
 
-    private void createUser(HttpServletRequest request, HttpServletResponse response) 
+    private void createUser(HttpServletRequest request, HttpServletResponse response)
     throws SQLException,IOException,ServletException{
         String email = request.getParameter("email");
         String password = request.getParameter("password");
@@ -165,8 +159,9 @@ public class UsersController extends HttpServlet {
         String address = request.getParameter("address");
         String bankname = request.getParameter("bankname");
         String accountno = request.getParameter("accountno");
+        String created_at = request.getParameter("created_at");
         
-        User user = new User();
+        User user= new User();
         user.setEmail(email);
         user.setPassword(password);
         user.setRetpassword(retpassword);
@@ -174,17 +169,18 @@ public class UsersController extends HttpServlet {
         user.setAddress(address);
         user.setBankname(bankname);
         user.setAccountno(accountno);
+        
         if(user.create()){
             message="new user added";
             request.setAttribute("message", message);
-            response.sendRedirect("user?action="+add_action);
-        }
-        else{
-            message= "new user failed to add";
+            response.sendRedirect("users?action="+add_action);
+        }else{
+            message = "new user failed to add";
             request.setAttribute("message", message);
-            request.getRequestDispatcher("user?action="+add_action).include(request, response);
+            request.getRequestDispatcher("users?action="+add_action).include(request, response);
         }
-        
     }
 
 }
+
+
