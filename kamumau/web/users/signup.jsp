@@ -1,8 +1,9 @@
 <%-- 
     Document   : signup
-    Created on : Oct 16, 2018, 3:42:41 PM
+    Created on : Oct 22, 2018, 11:21:17 AM
     Author     : MSyafiqMarzuki
 --%>
+
 <link href="/WEB-INF/stylesheets/jumbotron.css" rel="stylesheet">
 
 <%@include file= "/layouts/header.jsp" %>
@@ -11,19 +12,21 @@
 <br>
 <br>
 
+
+
 <div class="container">
+    <div class="jumbotron"
         
     <h1 class="h3 mb-3 font-weight-normal">Sign Up</h1>            
 
   <h4><c:out value='${message}' /></h4>
   
-  <div class="jumbotron">
 
-  <form action="/kamumau/user?action=create" method="post"> 
+  <form  action="/kamumau/users?action=create" method="post" class="w3-container"> 
   <%@include file= "form.html" %>
   </form>
+    </div>
   
-  </div>
 
   
   
