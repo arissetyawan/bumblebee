@@ -14,6 +14,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import model.User;
 
 /**
@@ -24,6 +25,7 @@ import model.User;
 public class UsersController extends ApplicationController {
     private final static String add_action ="new";
     private final static String login_action = "login";
+    private final static String update_action ="update";
     private final static String logout_action = "logout";
     private final static String list_action = "list";
     private String message="";
@@ -61,6 +63,13 @@ public class UsersController extends ApplicationController {
             case "welcome":
                 showWelcomePage(request, response);
                 break;
+            case "myprofil":
+                mustLoggedIn(request, response);
+                showMyProfil(request, response);
+                break;
+            case "update":
+                mustLoggedIn(request, response);
+                updateUser(request, response);
             default:
                 showLoginForm(request, response);
                 break;
@@ -77,7 +86,6 @@ public class UsersController extends ApplicationController {
                 String passwd= request.getParameter("password");
                 User user= new User();     
                 user.setEmail(email);
-                System.out.println("Isi email : " + email + " passwordnya : "+ passwd);
                 
                 user.setPassword(passwd);
                 logout(request, response);
@@ -87,6 +95,7 @@ public class UsersController extends ApplicationController {
                     System.out.println("Login berhasil.");
                     
                 }else{
+                    showLoginForm(request, response);
                     System.out.println("Login gagal.");
                 }
         }
@@ -146,7 +155,7 @@ public class UsersController extends ApplicationController {
 
     private void ShowNewForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException,IOException{
-        RequestDispatcher dispatcher = request.getRequestDispatcher("users/signup.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/users/signup.jsp");
         dispatcher.forward(request, response);
     }        
 
@@ -180,6 +189,50 @@ public class UsersController extends ApplicationController {
             request.getRequestDispatcher("users?action="+add_action).include(request, response);
         }
     }
+
+    private void showMyProfil(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException,IOException{
+        User user = new User();
+       // int id = Integer.parseInt(request.getParameter("id"));
+       // request.setAttribute("user", user.find(id));
+       HttpSession session = request.getSession();
+//        int id = Integer.parseInt(session.getAttribute("current_user"));
+        
+        RequestDispatcher dispatcher = request.getRequestDispatcher("users/myprofil.jsp");
+        dispatcher.forward(request, response);
+    }
+
+    private void updateUser(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException,IOException,ServletException{
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+        String retpassword = request.getParameter("retpassword");
+        String fullname = request.getParameter("fullname");
+        String address = request.getParameter("address");
+        String bankname = request.getParameter("bankname");
+        String accountno = request.getParameter("accountno");
+        String update_at = request.getParameter("update_at");
+        
+        User user= new User();
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setRetpassword(retpassword);
+        user.setFullname(fullname);
+        user.setAddress(address);
+        user.setBankname(bankname);
+        user.setAccountno(accountno);
+        
+        if(user.update()){
+            message="new user added";
+            request.setAttribute("message", message);
+            response.sendRedirect("users?action="+update_action);
+        }else{
+            message = "new user failed to add";
+            request.setAttribute("message", message);
+            request.getRequestDispatcher("users?action="+update_action).include(request, response);
+        }
+    }
+    
 
 }
 
