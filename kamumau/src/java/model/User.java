@@ -162,34 +162,33 @@ public class User extends MyConnection {
         return users;
     }
     
-//    public User find(int id){
-//        User user = new User();
-//        String query = "SELECT * FROM " + tableName + " WHERE id = " + id + " ";
-//        try {
-//            Statement stmt = this.conn().createStatement();
-//            ResultSet res = stmt.executeQuery(query);
-//            if (res.next()) {
-//                user.setEmail(res.getString("name"));
-//                user.setPassword(res.getString("phone"));
-//                user.setRetpassword(res.getString("profession"));
-//                user.setFullname (res.getString("fullname"));
-//                user.setAddress(res.getString("address"));
-//                user.setBankname(res.getString("bankname"));
-//                user.setAccountno(res.getString("accountno"));
-//                user.setCreated_at(res.getDate("created_at"));
-//                user.setId(res.getInt("id"));
-//            }
-//        } catch (SQLException e) {
-//            System.out.println(e.getMessage());
-//        }
-//        return user;
-//    }
+    public User find(int id){
+        User user = new User();
+        String query = "SELECT * FROM " + tableName + " WHERE id = " + id + " ";
+        try {
+            Statement stmt = this.conn().createStatement();
+            ResultSet res = stmt.executeQuery(query);
+            if (res.next()) {
+                user.setEmail(res.getString("name"));
+                user.setPassword(res.getString("phone"));
+                user.setRetpassword(res.getString("profession"));
+                user.setFullname (res.getString("fullname"));
+                user.setAddress(res.getString("address"));
+                user.setBankname(res.getString("bankname"));
+                user.setAccountno(res.getString("accountno"));
+                user.setCreated_at(res.getDate("created_at"));
+                user.setId(res.getInt("id"));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return user;
+    }
 
     public boolean doLogin() {
         User user = new User();
         // find to db match it by email and password;
         String query = "SELECT * FROM " + tableName + " WHERE email = '" + this.email + "' and password = '" + this.password + "'";
-        // select * from user where email = this.email and password= this.password
         try {
             Statement stmt = this.conn().createStatement();
             ResultSet res = stmt.executeQuery(query);
@@ -197,14 +196,31 @@ public class User extends MyConnection {
                 user.setEmail(res.getString("email"));
                 user.setPassword(res.getString("password"));
                 user.setId(res.getInt("id"));
-                System.out.println("id nya"+ this.id);
-                System.out.println("nya"+ res.getInt("id"));
-
                 this.id= res.getInt("id"); //get it from db
                 return true;
             }else{
                 return false;
             }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+    
+    public boolean update() {
+        if(!validate()){
+            return false;
+        }
+        String query = "UPDATE "+ tableName + " SET email='"
+        + this.email + "', password='" + this.password
+        + "', fullname='" + this.fullname
+        + "', address='" + this.address
+        + "', bankname='" + this.bankname
+        + "', accountno='" + this.accountno
+        + "' WHERE id = " + this.id + " ";
+        try {
+            Statement stmt = this.conn().createStatement();
+            return stmt.executeUpdate(query) > 0;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             return false;
