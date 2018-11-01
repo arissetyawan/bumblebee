@@ -22,17 +22,28 @@ import java.util.ArrayList;
  * @author x201
  */
 public class Category extends MyConnection {
-    private String tableName="categories";
+    private final String tableName="categories";
     public String name;
     public int category_id;
 
+    public Category(){
+        super();
+    }
+    public int getId(){
+        return id;
+    }
     public void setId(int id) {
         this.id = id;
+    }
+    public int getParentId() {
+        return category_id;
     }
     public void setParentId(int category_id) {
         this.category_id = category_id;
     }
-    
+    public String getName() {
+        return name;
+    }
     public void setName(String name) {
         this.name = name;
     }
@@ -56,17 +67,45 @@ public class Category extends MyConnection {
 
     public boolean create() {
         boolean result;
+        if(!validate()){
+            return false;
+        }
         String query = "INSERT INTO "+ tableName +"(name, category_id) values ('" + this.name + "', '" + this.category_id + "')";
         try {
-            result= this.stateOpen().executeUpdate(query) > 0;
-            this.stateClose();
-            return result;
+            Statement stmt= this.conn().createStatement();
+            return stmt.executeUpdate(query)>0;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             return false;
         }
     }
 
+    public boolean update() {
+        if(!validate()){
+            return false;
+        }
+        String query = "UPDATE "+ tableName + " SET name='"+ this.name
+        + "', category_id='" + this.category_id
+        + "' WHERE id = " + this.id + " ";
+        try {
+            Statement stmt = this.conn().createStatement();
+            return stmt.executeUpdate(query) > 0;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+    
+    public boolean delete() {
+        String query = "DELETE FROM " + tableName + " WHERE id = " + this.id + " ";
+        try {
+            Statement stmt = this.conn().createStatement();
+            return stmt.executeUpdate(query) > 0;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
 
     public ArrayList<Category> all(){
         String query = "SELECT * FROM " + tableName;
@@ -86,5 +125,13 @@ public class Category extends MyConnection {
             System.out.println(e.getMessage());
         }
         return categories;
+    }
+
+    private boolean validate() {
+        boolean status= false;
+        if (!"".equals(this.name) &&  !"".equals(this.category_id)){
+            status= true;
+        } 
+        return status;
     }
 }
