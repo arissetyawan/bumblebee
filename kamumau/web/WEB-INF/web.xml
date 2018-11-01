@@ -12,6 +12,10 @@
         <servlet-name>FeedbacksController</servlet-name>
         <servlet-class>controller.FeedbacksController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ProductsController</servlet-name>
+        <servlet-class>controller.ProductsController</servlet-class>
+    </servlet>
 <!--    <servlet-mapping>
         <servlet-name>PeopleController</servlet-name>
         <url-pattern>/people</url-pattern>
@@ -23,6 +27,10 @@
     <servlet-mapping>
         <servlet-name>FeedbacksController</servlet-name>
         <url-pattern>/feedbacks</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProductsController</servlet-name>
+        <url-pattern>/products</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
