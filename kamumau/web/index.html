@@ -6,16 +6,25 @@ and open the template in the editor.
 -->
 <html>
     <head>
-        <title>People Management</title>
+        <title>KamuMau</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
+        
+        <!--
+        @damarpermadany
+        testing feedback form
+        -->
         <div>
-        <h1>People Management</h2>
+            <h1>Feedback Form Test</h2>
         <hr />
-        <a href="people?action=new">Add Person</a>
-        <a href="people?action=list">View People</a>
+        <!--
+        seller_id using static id    
+        -->
+        <a href="feedbacks?action=new&seller_id=3">Add Feedback</a>
+        <a href="feedbacks?action=list&seller_id=3">View List Feedback</a>
+        <p style="color: red;"><small>warning, this seller_id is static id. Just change the seller_id in URL if you want to see comment on another seller_id </small></p>
         <hr />
         </div>
     </body>
