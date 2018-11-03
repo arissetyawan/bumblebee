@@ -48,6 +48,15 @@ public class MyConnection {
         try {
             System.out.println("Connecting...");
             DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+           
+            /*
+            @DamarPermadany's Connection
+            Just for trying on mylocalrepo
+            this.conn= DriverManager.getConnection(
+                    "jdbc:mysql://localhost:3306/oop2_db", "root", "");
+            */
+           
+                    
             this.conn= DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/jspmvcjdbc", "root", "root");
             System.out.println("Connected");
