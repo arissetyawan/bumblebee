@@ -91,8 +91,8 @@ public class Feedback extends MyConnection {
         }
     }
     
-    public ArrayList<Feedback> all(){
-        String query = "SELECT * FROM " + tableName;
+    public ArrayList<Feedback> all(int sellerId){
+        String query = "SELECT * FROM " + tableName + " WHERE seller_id = " +sellerId;
         ArrayList<Feedback> feedbacks = new ArrayList<>();
         try {
             Statement stmt = this.conn().createStatement();
