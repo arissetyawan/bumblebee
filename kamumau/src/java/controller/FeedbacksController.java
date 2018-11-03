@@ -22,6 +22,9 @@ import model.Feedback;
 @WebServlet(name = "FeedbacksController", urlPatterns = {"/FeedbacksController"})
 public class FeedbacksController extends HttpServlet {
     
+    private final static String list_action = "list";
+    private String message= "";
+    
   protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -32,6 +35,9 @@ public class FeedbacksController extends HttpServlet {
                 switch (action) {
                     case "new":
                         showNewForm(request, response);
+                        break;
+                    case "create":
+                        createFeedback(request, response);
                         break;
                     default:
                         listFeedback(request, response);
@@ -52,10 +58,39 @@ public class FeedbacksController extends HttpServlet {
     private void listFeedback(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException, ServletException {
         Feedback f = new Feedback();
-        List<Feedback> feedbacks = f.all();
+        int sellerId = Integer.parseInt(request.getParameter("seller_id"));
+        List<Feedback> feedbacks = f.all(sellerId);
         request.setAttribute("feedbacks", feedbacks);
         RequestDispatcher dispatcher = request.getRequestDispatcher("feedbacks/list.jsp");
-        dispatcher.forward(request, response);
+        dispatcher.forward(request, response);  
+    }
+    
+    private void createFeedback(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
+
+        String content = request.getParameter("content");
+        int rating = Integer.parseInt(request.getParameter("rating"));
+        int orderId = Integer.parseInt(request.getParameter("order_no"));
+        int sellerId = 3;
+        int buyerId = 2;
+        
+        
+        Feedback feedback = new Feedback();
+        feedback.setContent(content);
+        feedback.setRating(rating);
+        feedback.setOrderId(orderId);
+        feedback.setSellerId(sellerId);
+        feedback.setBuyerId(buyerId);
+        
+        if (feedback.create()) {
+            message = "new feedback added";
+            request.setAttribute("message", message);
+            response.sendRedirect("feedbacks?action="+list_action+"&seller_id=3");
+        }else{
+            message= "new feedback failed to add";
+            request.setAttribute("message", message);
+            request.getRequestDispatcher("feedbacks?action="+list_action).include(request, response);
+        }
     }
     
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
