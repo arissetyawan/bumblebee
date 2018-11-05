@@ -21,6 +21,6 @@
     <br />      
     <br />      
     <h1 class="h3 mb-3 font-weight-normal">Welcome, see you again !</h1>
-    <% out.println("Debugged Logged User: " + session.getAttribute("current_user")); %>
+   <% out.println("Debugged Logged User: " + session.getAttribute("current_user")); %>
     
 <%@include file= "/layouts/footer.html" %>

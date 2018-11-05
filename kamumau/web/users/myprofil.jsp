@@ -1,9 +1,9 @@
 <%-- 
-    Document   : signup
-    Created on : Oct 16, 2018, 3:42:41 PM
+    Document   : myprofil
+    Created on : Oct 31, 2018, 6:39:29 AM
     Author     : MSyafiqMarzuki
 --%>
-<link href="/WEB-INF/stylesheets/login.css" rel="stylesheet">
+
 <link href="/WEB-INF/stylesheets/jumbotron.css" rel="stylesheet">
 
 <%@include file= "/layouts/header.jsp" %>
@@ -17,19 +17,20 @@
 <div class="container">
     <div class="jumbotron"
         
-    <h1 class="h3 mb-3 font-weight-normal">Sign Up</h1>            
+    <h1 class="h3 mb-3 font-weight-normal">My Profil</h1>            
 
   <h4><c:out value='${message}' /></h4>
+
   
 
-  <form  action="/kamumau/users?action=create" method="post" class="w3-container"> 
-  <table>
+  <form  action="/kamumau/users?action=update" method="post" class="w3-container"> 
+      <table>
             <tr><td>Email</td>
                 <td><input type="text" class="w3-input" name="email" value="<c:out value='${user.getEmail()}'/>"/></td></tr>
             <tr><td>Password</td> 
                 <td><input type="password" class="w3-input" name="password" id="password" value="<c:out value='${user.getPassword()}' />"/></td></tr>
             <tr><td>ReTypePassword</td>
-                <td><input type="password" class="w3-input" name="repassword" id="repassword" value="<c:out value='${user.geRetpassword()}' />"/> <span id='message'></span></td></tr>
+                <td><input type="password" class="w3-input" name="repassword" id="repassword" /> <span id='message'></span></td></tr>
             <tr><td>Full Name</td>
                 <td><input type="text" class="w3-input" name="fullname" value="<c:out value='${user.getFullname()}' />"/></td></tr>
             <tr><td>Address</td>
@@ -44,13 +45,14 @@
                 </td></tr>
             <tr><td>Account No</td>
                 <td><input type="text" class="w3-input" name="accountno" value="<c:out value='${user.getAccountno()}' />"/></td></tr>
-            <tr><td colspan="2"><input type="submit" value="Sign In"/></td></tr>   
+            <tr><td colspan="2"><input type="submit" value="Update"/></td></tr>   
            
             
         </table>
 
   </form>
     </div>
+             <a class="btn btn-danger" href="users?action=deluser">OFF User</a>
   
 
   
