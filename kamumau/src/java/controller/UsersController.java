@@ -56,11 +56,13 @@ public class UsersController extends ApplicationController {
                 break;
             case "logout":
                 doLogout(request, response);
+                logout(request, response);
                 break;
             case "do-login":
                 doLogin(request, response);
                 break;
             case "welcome":
+                mustLoggedIn(request, response);
                 showWelcomePage(request, response);
                 break;
             case "myprofil":
@@ -70,6 +72,9 @@ public class UsersController extends ApplicationController {
             case "update":
                 mustLoggedIn(request, response);
                 updateUser(request, response);
+            case "deluser":
+                mustLoggedIn(request, response);
+                offUser(request,response);
             default:
                 showLoginForm(request, response);
                 break;
@@ -106,12 +111,12 @@ public class UsersController extends ApplicationController {
         }
     private void showLoginForm(HttpServletRequest request, HttpServletResponse response)
                 throws ServletException, IOException, ServletException  {
-            RequestDispatcher dispatcher = request.getRequestDispatcher("/users/login.jsp");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("users/login.jsp");
             dispatcher.forward(request, response);
         }
     private void showWelcomePage(HttpServletRequest request, HttpServletResponse response)
                 throws ServletException, IOException, ServletException  {
-            RequestDispatcher dispatcher = request.getRequestDispatcher("/users/welcome.jsp");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("users/welcome.jsp");
             dispatcher.forward(request, response);
         }
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -155,7 +160,7 @@ public class UsersController extends ApplicationController {
 
     private void ShowNewForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException,IOException{
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/users/signup.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("users/signup.jsp");
         dispatcher.forward(request, response);
     }        
 
@@ -182,7 +187,7 @@ public class UsersController extends ApplicationController {
         if(user.create()){
             message="new user added";
             request.setAttribute("message", message);
-            response.sendRedirect("users?action="+add_action);
+            response.sendRedirect("users?action="+login_action);
         }else{
             message = "new user failed to add";
             request.setAttribute("message", message);
@@ -192,12 +197,11 @@ public class UsersController extends ApplicationController {
 
     private void showMyProfil(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException,IOException{
+        HttpSession session = request.getSession();
+        String profil = session.getAttribute("current_user").toString();
         User user = new User();
-       // int id = Integer.parseInt(request.getParameter("id"));
-       // request.setAttribute("user", user.find(id));
-       HttpSession session = request.getSession();
-//        int id = Integer.parseInt(session.getAttribute("current_user"));
-        
+        user = user.find(Integer.parseInt(profil));
+        request.setAttribute("user", user);
         RequestDispatcher dispatcher = request.getRequestDispatcher("users/myprofil.jsp");
         dispatcher.forward(request, response);
     }
@@ -213,6 +217,10 @@ public class UsersController extends ApplicationController {
         String accountno = request.getParameter("accountno");
         String update_at = request.getParameter("update_at");
         
+        HttpSession session = request.getSession();
+        String profil = session.getAttribute("current_user").toString();
+        
+        
         User user= new User();
         user.setEmail(email);
         user.setPassword(password);
@@ -221,15 +229,34 @@ public class UsersController extends ApplicationController {
         user.setAddress(address);
         user.setBankname(bankname);
         user.setAccountno(accountno);
+        user.setId(Integer.parseInt(profil));
         
         if(user.update()){
-            message="new user added";
+            message="update succes";
             request.setAttribute("message", message);
-            response.sendRedirect("users?action="+update_action);
+            response.sendRedirect("users?action=myprofil");
         }else{
-            message = "new user failed to add";
+            message = "update failed";
             request.setAttribute("message", message);
-            request.getRequestDispatcher("users?action="+update_action).include(request, response);
+            request.getRequestDispatcher("users?action=myprofil").include(request, response);
+        }
+    }
+
+    private void offUser(HttpServletRequest request, HttpServletResponse response) throws SQLException,IOException,ServletException {
+        HttpSession session = request.getSession();
+        String profil = session.getAttribute("current_user").toString();
+        
+        User user= new User();
+        user.setId(Integer.parseInt(profil));
+        if(user.deluser()){
+            message="delete";
+            request.setAttribute("message", message);
+            response.sendRedirect("users?action=login");
+            logout(request, response);
+        }else{
+            message = "user failed to off account";
+            request.setAttribute("message", message);
+            request.getRequestDispatcher("users?action=myprofil").include(request, response);
         }
     }
     
