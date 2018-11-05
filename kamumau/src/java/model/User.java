@@ -25,6 +25,25 @@ public class User extends MyConnection {
     public String accountno;
     public Date created_at;
     public Date updated_at;
+    public String status;
+
+    public Date getCreated_at() {
+        return created_at;
+    }
+
+    public Date getUpdated_at() {
+        return updated_at;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+    
+    
 
     public void setEmail(String email) {
         this.email = email;
@@ -119,7 +138,7 @@ public class User extends MyConnection {
         if(!validate()){
             return false;
         }
-        String query ="INSERT INTO "+ tableName+"(email,password,fullname,address,bankname,accountno,created_at) values ('"+this.email+"','"+ this.password+"','"+ this.fullname+"','"+ this.address+"','"+ this.bankname+"','"+ this.accountno+"','"+now_date+"')";
+        String query ="INSERT INTO "+ tableName+"(email,password,fullname,address,bankname,accountno,created_at) values ('"+this.email+"','"+ this.password+"','"+ this.fullname+"','"+ this.address+"','"+ this.bankname+"','"+ this.accountno+"','"+now_date+"')"; 
         try{
             Statement stmt = this.conn().createStatement();
             return stmt.executeUpdate(query)>0;
@@ -153,6 +172,7 @@ public class User extends MyConnection {
                 user.setAccountno(res.getString("accountno"));
                 user.setCreated_at(res.getDate("created_at"));
                 
+                
                 user.setId(res.getInt("id"));
                 users.add(user);
             }
@@ -169,14 +189,12 @@ public class User extends MyConnection {
             Statement stmt = this.conn().createStatement();
             ResultSet res = stmt.executeQuery(query);
             if (res.next()) {
-                user.setEmail(res.getString("name"));
-                user.setPassword(res.getString("phone"));
-                user.setRetpassword(res.getString("profession"));
-                user.setFullname (res.getString("fullname"));
-                user.setAddress(res.getString("address"));
-                user.setBankname(res.getString("bankname"));
-                user.setAccountno(res.getString("accountno"));
-                user.setCreated_at(res.getDate("created_at"));
+                user.setEmail(res.getString("email"));
+                user.setPassword(res.getString("password"));
+                user.setRetpassword(res.getString("fullname"));
+                user.setFullname (res.getString("address"));
+                user.setAddress(res.getString("bankname"));
+                user.setBankname(res.getString("accountno"));
                 user.setId(res.getInt("id"));
             }
         } catch (SQLException e) {
@@ -226,6 +244,18 @@ public class User extends MyConnection {
             return false;
         }
     }
+    
+    public boolean deluser(){
+        
+       String query = "UPDATE "+ tableName + " SET status = 0 WHERE id = " + this.id + " ";
+        try {
+            Statement stmt = this.conn().createStatement();
+            return stmt.executeUpdate(query) > 0;
+        } catch (SQLException e) {
+            System.out.println("deluser() : "+e.getMessage());
+            return false;
+        }
+   } 
     
     
     
